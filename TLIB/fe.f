@@ -295,12 +295,12 @@ c
         implicit none
         double precision, intent (in) :: A(9)
         double precision, intent (out) :: vm
-        double precision :: DEV(9,9), J2
+        double precision :: DEV(9,9), S(9), J2
 c
 c       
         call DEV4(DEV)
-        call tc_4d2(DEV,A,A)
-        call tc_2d2 (A,A,vm)
+        call tc_4d2(DEV,A,S)
+        call tc_2d2 (S,S,vm)
         vm = SQRT(1.5_8*vm)
 c
         return

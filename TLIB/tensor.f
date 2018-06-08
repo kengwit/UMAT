@@ -1,7 +1,7 @@
 c ===============================
 c
 c Tensor Library for ME725
-c Version 0.1 LM: 20180605
+c 
 c P.Sathananthan
 c
 c ===============================
@@ -284,20 +284,12 @@ c
 c       calculate qt
 c
         call tpose (Q,Qt)
-        print *,
-        call t2print(Qt)
-        print *,
 c
 c        let      B = QA
 c        we want  B = (QA)Qt
 c        then     B = BQt
 c
         call tc_2s2 (A,Qt,B)
-        print *,
-        call t2print (B)
-        print *,
-        call t2print (Q)
-        print *,
         call tc_2s2 (Q,B,C)
 c
         return

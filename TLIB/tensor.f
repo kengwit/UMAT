@@ -67,7 +67,7 @@ c
 c       hard-code transpose for SPEED!!!
 c
         B(1)=A(1)
-	B(2)=A(4)
+        B(2)=A(4)
         B(3)=A(7)
         B(4)=A(2)
         B(5)=A(5)
@@ -275,7 +275,7 @@ c Transformation of second order tensor
 c
        subroutine transform2 (A,Q,C)
 c
-	implicit none
+        implicit none
         double precision, intent (in) :: A(9), Q(9)
         double precision, intent (out) :: C(9)
         double precision :: B(9)

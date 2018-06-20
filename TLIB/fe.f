@@ -13,6 +13,7 @@ c  ANT4        -> returns antisymmetric identity tensor
 c  VOL4        -> returns volumetric identity tensor
 c  DEV4        -> returns deviatoric identity tensor
 c  SEQ         -> find von Mises stress of a tensor
+c  CH          -> converts 2nd order tensor into principal space
 c
        subroutine I1 (A2,x)
 c
@@ -285,7 +286,6 @@ c
         call VOL4(I)
         call IDN4(eye4)
         I = eye4-I
-c
         return
 c
        end subroutine DEV4
@@ -306,4 +306,57 @@ c
         return
 c
        end subroutine SEQ
+c
+c      Caley-Hamilton Theorem to find principal values
+c
+       subroutine CH (A,B)
+c
+        double precision, intent (in) :: A(9)
+        double precision, intent (out) :: B(9)
+        double precision :: H1, H2, H3, p, q, th, tol,
+     &                      pie
+c
+        call PI(pie)
+c
+        H1 = A(1)/3.0_8+A(5)/3.0_8+A(9)/3.0_8
+        H2 = (A(2)*A(2)+A(7)*A(7)+A(6)*A(6)
+     &       -A(1)*A(5)-A(5)*A(9)-A(9)*A(1))/3.0_8
+        H3 =       A(6)*A(7)*A(2)+0.5_8*A(1)*A(5)*A(9)
+     &      -0.5_8*A(1)*A(6)*A(6)-0.5_8*A(5)*A(7)*A(7)
+     &      -0.5_8*A(9)*A(2)*A(2) 
+c
+        p = H1*H1+H2
+c 
+c       check whether p is close to zero to avoid
+c       entering inf. into arccos...
+c
+        if (p.LT.1E-6_8 .AND. p.GT.-1E-6_8) then
+           p = SIGN (1E-6_8,p)
+        end if
+        q = H1*H1*H1+1.5_8*H1*H2+H3
+c
+        th = q/p**1.5_8
+c
+c       check whether q/p**1.5 surpasses -1/1
+c       due to numerical round off
+c
+        if (th.GT.1.0_8) then
+          th = 1.0_8
+        else if (th.LT.-1.0_8) then
+          th = -1.0_8
+        end if
+        th = ACOS (th) / 3.0_8
+c
+c       define intermediates to speed things up
+c
+        alp = 2.0_8*SQRT(p)
+        bet = pie / 3.0_8
+        B = 0.0_8
+        B(1) = alp*COS(th)+H1
+        B(5) = alp*COS(th+4.0_8*bet)+H1
+        B(9) = alp*COS(th+2.0_8*bet)+H1
+c
+        return
+c
+       end subroutine CH
 c

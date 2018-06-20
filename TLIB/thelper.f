@@ -22,3 +22,13 @@ c
        end do
 c
       end subroutine t4print
+c
+      subroutine PI (p)
+c
+       implicit none
+       double precision, intent (out) :: p
+c
+       p = 4.0_8*atan(1.0_8)
+c
+      end subroutine pi
+c

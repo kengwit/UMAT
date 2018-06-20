@@ -14,6 +14,7 @@ c  VOL4        -> returns volumetric identity tensor
 c  DEV4        -> returns deviatoric identity tensor
 c  SEQ         -> find von Mises stress of a tensor
 c  CH          -> converts 2nd order tensor into principal space
+c  VMS         -> calculate von Mises stress
 c
        subroutine I1 (A2,x)
 c
@@ -359,4 +360,17 @@ c
         return
 c
        end subroutine CH
+c
+       subroutine VMS (A,vm)
+c
+        double precision, intent (in) :: A(9)
+        double precision, intent (out) :: vm
+c
+        vm = SQRT(A(1)*A(1)+A(5)*A(5)+A(9)*A(9)
+     &      -A(1)*A(5)-A(5)*A(9)-A(9)*A(1)
+     &      +3.0_8*A(6)*A(6)+3.0_8*A(7)*A(7)+3.0_8*A(2)*A(2))
+c
+        return
+c
+       end subroutine VMS
 c

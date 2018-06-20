@@ -324,11 +324,13 @@ c
        print *,
        call t2print(A)
        print *,
-       call SEQ(A,vm)
+c       call SEQ(A,vm)
        print *,
        print *,"von Mises:"
        print *,
-       print "(1e12.4)",vm
+c       print "(1e12.4)",vm
+       call VMS(A,vm)
+       print *,vm
        print *,      
        print *,"----------------"
        print *,"End VM test"

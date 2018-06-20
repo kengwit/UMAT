@@ -19,7 +19,8 @@ c  F2C         -> find right green-lagrange tensor from def. grad
 c  F2B         -> find left green-lagrange tensor from def. grad
 c  F2U         -> find lagrangian stretch tensor from def. grad  
 c  F2V         -> find eulerian stretch tensor from def grad
-c
+c  SYM2        -> get symmetric component of a second order tensor
+c  SKEW2       -> get skew component of a second order tensor
 c
        subroutine I1 (A2,x)
 c
@@ -404,4 +405,30 @@ c
         return
 c
        end subroutine F2B
+c
+       subroutine SYM2 (A,B)
+c
+        double precision, intent (in) :: A(9)
+        double precision, intent (out) :: B(9)
+        double precision :: At(9)
+c
+        call tpose (A,At)
+        B = 0.5_8*A+0.5_8*At
+c
+        return
+c
+       end subroutine SYM2
+c
+       subroutine SKEW2 (A,B)
+c
+        double precision, intent (in) :: A(9)
+        double precision, intent (out) :: B(9)
+        double precision :: At(9)
+c
+        call tpose (A,At)
+        B = 0.5_8*A-0.5_8*At
+c
+        return
+c
+       end subroutine SKEW2
 c

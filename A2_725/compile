@@ -1,0 +1,5 @@
+#!/bin/bash
+#compile A2-ME 725
+clear
+gfortran -o A2 A2.f ../TLIB/tensor.f ../TLIB/thelper.f ../TLIB/fe.f 2>error.log
+head error.log

@@ -15,6 +15,11 @@ c  DEV4        -> returns deviatoric identity tensor
 c  SEQ         -> find von Mises stress of a tensor
 c  CH          -> converts 2nd order tensor into principal space
 c  VMS         -> calculate von Mises stress
+c  F2C         -> find right green-lagrange tensor from def. grad
+c  F2B         -> find left green-lagrange tensor from def. grad
+c  F2U         -> find lagrangian stretch tensor from def. grad  
+c  F2V         -> find eulerian stretch tensor from def grad
+c
 c
        subroutine I1 (A2,x)
 c
@@ -373,4 +378,30 @@ c
         return
 c
        end subroutine VMS
+c
+       subroutine F2C (F,C)
+c
+        double precision, intent (in) :: F(9)
+        double precision, intent (out) :: C(9)
+        double precision :: Ft (9)
+c
+        call tpose (F,Ft)
+        call tc_2s2(Ft,F,C)
+c
+        return
+c
+       end subroutine F2C
+c
+       subroutine F2B (F,B)
+c
+        double precision, intent (in) :: F(9)
+        double precision, intent (out) :: B(9)
+        double precision :: Ft (9)
+c
+        call tpose (F,Ft)
+        call tc_2s2(F,Ft,B)
+c
+        return
+c
+       end subroutine F2B
 c

@@ -21,6 +21,7 @@ c  F2U         -> find lagrangian stretch tensor from def. grad
 c  F2V         -> find eulerian stretch tensor from def grad
 c  SYM2        -> get symmetric component of a second order tensor
 c  SKEW2       -> get skew component of a second order tensor
+c  PD          -> get R,U,V from F using Hoger & Calson method           
 c
        subroutine I1 (A2,x)
 c
@@ -431,4 +432,46 @@ c
         return
 c
        end subroutine SKEW2
+c
+c      Perform a polar decomposition of F into 
+c      R,U and V using the Hoger&Carlson method
+c             
+c                     F=RU=VR.
+c
+       subroutine PD (F,R,U,V)
+c
+        double precision, intent (in) :: F(9)
+        double precision, intent (out) :: R(9),U(9),V(9)
+        double precision :: UP1, UP2, UP3
+        double precision :: I1U, I2U, I3U
+        double precision :: C(9), CP(9),UINV(9),Ft(9)
+        double precision :: alp(9), ainv(9), bet(9), de(9)
+        double precision :: I2(9)
+c
+        I2 = (/ 1.0_8,0.0_8,0.0_8,
+     &          0.0_8,1.0_8,0.0_8,
+     &          0.0_8,0.0_8,1.0_8 /)
+        call F2C (F,C)
+        call CH (C,CP)
+        UP1 = SQRT(CP(1))
+        UP2 = SQRT(CP(5))
+        UP3 = SQRT(CP(9))
+c
+        I1U = UP1 + UP2 + UP3
+        I2U = UP1*UP2 + UP2*UP3 + UP3*UP1
+        I3U = UP1*UP2*UP3
+c
+        alp = C+I2U*I2
+        call invert (alp, ainv)
+        bet = I1U*C+I3U*I2
+        call tc_2s2 (ainv,bet,U)
+        call invert (U,UINV)
+        call tc_2s2 (F,UINV,R)
+        call tpose (F,Ft)
+        call tc_2s2 (UINV,Ft,de)
+        call tc_2s2 (F,de,V)
+c
+        return
+c
+       end subroutine PD         
 c

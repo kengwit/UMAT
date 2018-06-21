@@ -17,8 +17,6 @@ c  CH          -> converts 2nd order tensor into principal space
 c  VMS         -> calculate von Mises stress
 c  F2C         -> find right green-lagrange tensor from def. grad
 c  F2B         -> find left green-lagrange tensor from def. grad
-c  F2U         -> find lagrangian stretch tensor from def. grad  
-c  F2V         -> find eulerian stretch tensor from def grad
 c  SYM2        -> get symmetric component of a second order tensor
 c  SKEW2       -> get skew component of a second order tensor
 c  PD          -> get R,U,V from F using Hoger & Calson method           

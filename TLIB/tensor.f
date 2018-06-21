@@ -23,7 +23,6 @@ c  qzrad             -> rot tensor about z  (implemented)
 c  qxrad             -> rot tensor about x  (implemented)
 c  qyrad             -> rot tensor about y  (implemented)
 c  tp_2dy2           -> Cijkl = AijXBkl
-c  sqrt2             -> find the sqrt of a second order tensor
 c
 c -------------------------------
 c

@@ -23,12 +23,15 @@ c
         double precision, intent (in) :: cm (2),deps(9)
         double precision, intent (inout) :: sig(9),hisv(1)
         double precision :: dsig(9)
-        double precision :: L4(9)(9)
+        double precision :: L4(9,9)
 c
-c       Let cm(1) = E, cm(2) = v        
+c   cm(1) = E (Young's modulus) {Pa}
+c   cm(2) = v (Poisson's ratio) {-}        
 c
+        print *,cm(1),cm(2)
         call L4_EL (cm(1), cm(2), L4)
 c
+c        call t4print (L4)
         dsig = tc_4d2(L,deps)
         sig = sig + dsig
 c        

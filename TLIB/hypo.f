@@ -5,7 +5,7 @@ c
          double precision, intent(out) :: dF(9), Fb(9),lb(9),Db(9),Wb(9)
          double precision :: Ft (9)
 c
-         dF = F1-F
+         dF = F1-F0
 c
 c        Fb (b=0,0.5,1 for backward, midpoint, and forward)
 c

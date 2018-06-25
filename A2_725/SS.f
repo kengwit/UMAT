@@ -22,6 +22,7 @@ c
           ep = 0.0_8
           deps = 0.0_8
           sig = 0.0_8
+          D = 0.0_8
           F1 = (/ 1.0_8, 0.0_8, 0.0_8,
      &            0.0_8, 1.0_8, 0.0_8,
      &            0.0_8, 0.0_8, 1.0_8 /) 
@@ -54,13 +55,15 @@ c           Perform stress update on stress (sig dot hat, the stress update)
 c
 c            call umat_elastic (cm,deps,sig,hisv)
 c
-c            print *,
-            print *,"L"           
-            call t2print (l)
-c            print *, gam
             print *,
-            print *,"DEPS"
+            print *,"gamma:"
+            print "(1e12.4)",gam
+            print *,
+            print *,"DEPS"           
             call t2print (deps)
+            print *,
+            print *,"ep"
+            call t2print (ep)
             print *,
             gam = gam + dgam
 c         

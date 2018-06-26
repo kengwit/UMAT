@@ -10,9 +10,9 @@ c
           double precision :: cm(2), hisv(1)
           integer i,inc
 c
-          dgam = 0.001_8
+          dgam = 0.0001_8
           gam = 0.0_8
-          gf = 0.004_8
+          gf = 0.0004_8
           b = 0.5_8
 c
           inc = gf/dgam
@@ -53,17 +53,26 @@ c            sig = sig - sigW + Wsig
 c
 c           Perform stress update on stress (sig dot hat, the stress update)
 c
-c            call umat_elastic (cm,deps,sig,hisv)
+            call umat_elastic (cm,deps,sig,hisv)
 c
             print *,
             print *,"gamma:"
             print "(1e12.4)",gam
             print *,
-            print *,"DEPS"           
+            print *,"ep"           
+            call t2print (ep)
+            print *,
+            print *,"deps"
             call t2print (deps)
             print *,
-            print *,"ep"
-            call t2print (ep)
+            print *,"W"
+            call t2print (W)
+            print *,
+            print *,"D"
+            call t2print (D)
+            print *,
+            print *,"sig"
+            call t2print (sig)
             print *,
             gam = gam + dgam
 c         

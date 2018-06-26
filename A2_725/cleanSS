@@ -1,0 +1,6 @@
+#!/bin/bash
+#remove output files from running SS.f
+clear
+rm output.log
+rm error.log
+rm SS

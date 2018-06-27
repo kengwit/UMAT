@@ -65,9 +65,54 @@ c
         program A2_725
 c
          double precision :: A(9)
+         double precision :: f
+         f = 1.0e-8_8
 c
-         A = (/ 4.0,1.0,6.0,1.0,0.0,5.0,6.0,5.0,9.0 /)
-c         call testCH (A)
-         call testPD (A) 
+c        ZERO CHECK
+c
+         A = 0.0_8
+         call testCH(A)
+c
+c        ALREADY IN PRINCIPAL SPACE
+c
+         A = (/ 1.0_8, 0.0_8, 0.0_8,
+     &          0.0_8, 1.0_8, 0.0_8,
+     &          0.0_8, 0.0_8, 1.0_8 /)
+         call testCH(A)
+c
+c       ONE ZERO PRINCIPAL VALUE
+c
+         A = (/ 1.0_8, 0.0_8, 0.0_8,
+     &          0.0_8, 1.0_8, 0.0_8,
+     &          0.0_8, 0.0_8, 0.0_8 /)
+         call testCH(A)
+c
+c       TWO ZERO PRINCIPAL VALUES
+c
+         A = (/ 1.0_8, 0.0_8, 0.0_8,
+     &          0.0_8, 0.0_8, 0.0_8,
+     &          0.0_8, 0.0_8, 0.0_8 /)
+         call testCH(A)
+c
+c       TOLERANCE BUFFET
+c
+         A = (/ 1.0_8+f,           0.0_8, 0.0_8,
+     &            0.0_8, 1.0_8/(1.0_8+f), 0.0_8,
+     &            0.0_8,           0.0_8,     f /)
+         call testCH(A)
+c
+c       ALL TOLERANCE
+c
+         A = (/    f, 0.0_8, 0.0_8,
+     &         0.0_8,     f, 0.0_8,
+     &         0.0_8, 0.0_8,     f /)
+         call testCH(A)
+c
+c       RANDOM VALUES
+c
+         A = (/ 300.0_8,  -20.0_8,   25.0_8,
+     &          -20.0_8,  100.0_8, -125.0_8,
+     &           25.0_8, -125.0_8,   50.0_8 /)
+         call testCH(A)
 c
         end program A2_725

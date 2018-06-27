@@ -323,6 +323,7 @@ c
      &                      pie
 c
         call PI(pie)
+        tol = 1.0e-8_8
 c
         H1 = A(1)/3.0_8+A(5)/3.0_8+A(9)/3.0_8
         H2 = (A(2)*A(2)+A(7)*A(7)+A(6)*A(6)
@@ -336,8 +337,8 @@ c
 c       check whether p is close to zero to avoid
 c       entering inf. into arccos...
 c
-        if (p.LT.1E-6_8 .AND. p.GT.-1E-6_8) then
-           p = SIGN (1E-6_8,p)
+        if (ABS(p).LT.tol) then
+           p = tol
         end if
         q = H1*H1*H1+1.5_8*H1*H2+H3
 c
@@ -355,7 +356,7 @@ c
 c
 c       define intermediates to speed things up
 c
-        alp = 2.0_8*SQRT(p)
+        alp = 2.0_8*SQRT(H1*H1+H2)
         bet = pie / 3.0_8
         B = 0.0_8
         B(1) = alp*COS(th)+H1

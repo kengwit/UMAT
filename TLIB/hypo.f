@@ -9,7 +9,7 @@ c
 c
 c        Fb (b=0,0.5,1 for backward, midpoint, and forward)
 c
-         Fb = F0+b*F0+b*F1
+         Fb = F0-b*F0+b*F1
          call invert (Fb,Finv)
          call tc_2s2 (dF,Finv,lb)
          call SYM2 (lb,Db)

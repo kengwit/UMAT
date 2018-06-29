@@ -345,8 +345,16 @@ c
 c
          double precision, intent (in) :: A(9)
          double precision :: B(9)
+         double precision :: I1A,I2A,I3A
+         double precision :: I1B,I2B,I3B
 c
          call CH (A,B)
+         call I1 (A,I1A)
+         call I2 (A,I2A)
+         call I3 (A,I3A)
+         call I1 (B,I1B)
+         call I2 (B,I2B)
+         call I3 (B,I3B)
          print *,"----------------"
          print *,"Begin CH test"
          print *,"----------------"
@@ -357,6 +365,20 @@ c
          print *,"Principal Values:"
          print *,
          call t2print (B)
+         print *,
+         print *,"1st Invariant (should be equal)"
+         print *,
+         print "(2e12.4)",I1A,I1B
+         print *,
+         print *,
+         print *,"2nd Invariant (should be equal)"
+         print *,
+         print "(2e12.4)",I2A,I2B
+         print *,
+         print *,
+         print *,"3rd Invariant (should be equal)"
+         print *,
+         print "(2e12.4)",I3A,I3B
          print *,
          print *,"----------------"
          print *,"End CH test"

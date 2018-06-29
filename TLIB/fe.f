@@ -478,14 +478,16 @@ c         a3 =(a1+SQRT(a2))**th
 
 c
         if (a3.EQ.-2.0_8*I1C) then
-          I1U = ABSQRT(I1C+2.0_8*ABSQRT(I2C))
+          I1U = SQRT(ABS(I1C+2.0_8*SQRT(ABS(I2C))))
         else
-          k3 = ABSQRT(2.0_8*I1C+a3)
-          I1U = 0.5_8*(k3+ABSQRT(2.0_8*I1C-a3+16.0_8*ABSQRT(I3C)/k3))
+          k3 = SQRT(ABS(2.0_8*I1C+a3))
+          I1U = 0.5_8*(k3+
+     &                 SQRT(ABS(2.0_8*I1C-a3+
+     &                 16.0_8*SQRT(ABS(I3C))/k3)))
         end if
 c
         I2U = 0.5_8*I1U*I1U-0.5_8*I1C
-        I3U = ABSQRT (I3C)
+        I3U = SQRT (ABS(I3C))
 c        print *,
 c        call t2print (C)
 c        print *,

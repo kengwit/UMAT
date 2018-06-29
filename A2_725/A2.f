@@ -1,57 +1,40 @@
 c
         program A2_725
 c
-         double precision :: A(9)
-         double precision :: f,r
-         f = 1.0e-8_8
-         r = ABSPOW(-4.0_8,0.5_8)
-         print *,r
+         double precision :: F(9),R(9),U(9),V(9),Vp(9),Up(9)
+         double precision :: VP1,VP2,VP3
+         double precision :: UP1,UP2,UP3
+         double precision :: eu1,eu2,eu3
+         double precision :: la1,la2,la3
 c
-c        ZERO CHECK
-c
-         A = 0.0_8
-         call testCH(A)
-c
-c        ALREADY IN PRINCIPAL SPACE
-c
-         A = (/ 1.0_8, 0.0_8, 0.0_8,
+         F = (/ 1.0_8, 2.0_8, 0.0_8,
      &          0.0_8, 1.0_8, 0.0_8,
      &          0.0_8, 0.0_8, 1.0_8 /)
-         call testCH(A)
 c
-c       ONE ZERO PRINCIPAL VALUE
+        call PD (F,R,U,V)
+c        call testPD (F)
 c
-         A = (/ 1.0_8, 0.0_8, 0.0_8,
-     &          0.0_8, 1.0_8, 0.0_8,
-     &          0.0_8, 0.0_8, 0.0_8 /)
-         call testCH(A)
+        call CH (V,Vp)
+        call CH (U,Up)
+c        print *,
+c        call t2print (Vp)
+c        print *,
+        VP1 = Vp(1)
+        VP2 = Vp(5)
+        VP3 = Vp(9)
+        eu1 = LOG(VP1)
+        eu2 = LOG(VP2)
+        eu3 = LOG(VP3)
 c
-c       TWO ZERO PRINCIPAL VALUES
+        UP1 = Up(1)
+        UP2 = Up(5)
+        UP3 = Up(9)
+        la1 = LOG(UP1)
+        la2 = LOG(UP2)
+        la3 = LOG(UP3)
 c
-         A = (/ 1.0_8, 0.0_8, 0.0_8,
-     &          0.0_8, 0.0_8, 0.0_8,
-     &          0.0_8, 0.0_8, 0.0_8 /)
-         call testCH(A)
+        print "(3e12.4)",eu1,eu2,eu3
 c
-c       TOLERANCE BUFFET
-c
-         A = (/ 1.0_8+f,           0.0_8, 0.0_8,
-     &            0.0_8, 1.0_8/(1.0_8+f), 0.0_8,
-     &            0.0_8,           0.0_8,     f /)
-         call testCH(A)
-c
-c       ALL TOLERANCE
-c
-         A = (/    f, 0.0_8, 0.0_8,
-     &         0.0_8,     f, 0.0_8,
-     &         0.0_8, 0.0_8,     f /)
-         call testCH(A)
-c
-c       RANDOM VALUES
-c
-         A = (/ 300.0_8,  -20.0_8,   25.0_8,
-     &          -20.0_8,  100.0_8, -125.0_8,
-     &           25.0_8, -125.0_8,   50.0_8 /)
-         call testCH(A)
+        print "(3e12.4)",la1,la2,la3
 c
         end program A2_725

@@ -4,7 +4,7 @@ c
          double precision :: A(9)
          double precision :: f,r
          f = 1.0e-8_8
-         r = ABSQRT(-4.0_8)
+         r = ABSPOW(-4.0_8,0.5_8)
          print *,r
 c
 c        ZERO CHECK

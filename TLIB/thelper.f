@@ -32,3 +32,23 @@ c
 c
       end subroutine pi
 c
+      double precision function ABSPOW (a,b)
+c
+       implicit none
+       double precision, intent (in) :: a,b
+c
+       ABSPOW = ABS(a) ** b
+c
+       return
+c
+      end function ABSPOW
+c
+      double precision function ABSQRT (a)
+c
+       implicit none
+       double precision, intent (in) :: a 
+c
+       ABSQRT = SQRT(ABS(a))
+c
+      end function ABSQRT
+c

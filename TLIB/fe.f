@@ -19,7 +19,7 @@ c  F2C         -> find right green-lagrange tensor from def. grad
 c  F2B         -> find left green-lagrange tensor from def. grad
 c  SYM2        -> get symmetric component of a second order tensor
 c  SKEW2       -> get skew component of a second order tensor
-c  PD          -> get R,U,V from F using Hoger & Calson method           
+c  PD          -> get R,U,V from F using Hoger & Carlson method           
 c
        subroutine I1 (A2,x)
 c
@@ -45,7 +45,7 @@ c
         call I1(A2,trA)
         call I1(ASQ,trASQ)
 c
-        x = 0.5*trA*trA-0.5*trASQ
+        x = 0.5_8*trA*trA-0.5_8*trASQ
         return 
 c
        end subroutine I2
@@ -437,32 +437,71 @@ c      R,U and V using the Hoger&Carlson method
 c             
 c                     F=RU=VR.
 c
+c      You are an abomination. Yes you are...
+c
+c
        subroutine PD (F,R,U,V)
 c
         double precision, intent (in) :: F(9)
         double precision, intent (out) :: R(9),U(9),V(9)
-        double precision :: UP1, UP2, UP3
+        double precision :: I1C, I2C, I3C
         double precision :: I1U, I2U, I3U
-        double precision :: C(9), CP(9),UINV(9),Ft(9)
+        complex (8) :: a1, a2, a3
+        double precision :: k1, k2,k3, th
+        double precision :: C(9) ,UINV(9),Ft(9)
         double precision :: alp(9), ainv(9), bet(9), de(9)
-        double precision :: I2(9)
+        double precision :: eye(9)
 c
-        I2 = (/ 1.0_8,0.0_8,0.0_8,
-     &          0.0_8,1.0_8,0.0_8,
-     &          0.0_8,0.0_8,1.0_8 /)
+        eye = (/ 1.0_8,0.0_8,0.0_8,
+     &           0.0_8,1.0_8,0.0_8,
+     &           0.0_8,0.0_8,1.0_8 /)
         call F2C (F,C)
-        call CH (C,CP)
-        UP1 = SQRT(CP(1))
-        UP2 = SQRT(CP(5))
-        UP3 = SQRT(CP(9))
 c
-        I1U = UP1 + UP2 + UP3
-        I2U = UP1*UP2 + UP2*UP3 + UP3*UP1
-        I3U = UP1*UP2*UP3
+        call I1 (C,I1C)
+        call I2 (C,I2C)
+        call I3 (C,I3C)
 c
-        alp = C+I2U*I2
+        k1 = 32.0_8/27.0_8
+        k2 = 1024.0_8/27.0_8
+        th = 1.0_8/3.0_8
+        a1 = k1*2*I1C**3-k1*9*I1C*I2C+k1*27*I3C
+        a2 = k2*(4*I2C**3
+     &      -I1C*I1C*I2C*I2C
+     &      +4*I1C**3*I3C
+     &      -18*I1C*I2C*I3C
+     &      +27*I3C*I3C)
+        a3 =-2.0_8/3.0_8*I1C
+     &      +(a1+SQRT(a2))**th
+     &      +(a1-SQRT(a2))**th
+c
+c         a3 =(a1+SQRT(a2))**th
+
+c
+        if (a3.EQ.-2.0_8*I1C) then
+          I1U = ABSQRT(I1C+2.0_8*ABSQRT(I2C))
+        else
+          k3 = ABSQRT(2.0_8*I1C+a3)
+          I1U = 0.5_8*(k3+ABSQRT(2.0_8*I1C-a3+16.0_8*ABSQRT(I3C)/k3))
+        end if
+c
+        I2U = 0.5_8*I1U*I1U-0.5_8*I1C
+        I3U = ABSQRT (I3C)
+c        print *,
+c        call t2print (C)
+c        print *,
+c        print *,"INV OF C:"
+c        print "(3e12.4)",I1C,I2C,I3C
+c        print *,
+c        print *,"INV OF U:"
+c        print "(3e12.4)",I1U,I2U,I3U
+c        print *,
+c        print *,"INTERMEDIATE VALUES:"
+c        print "(2e12.4)",a1,a2,a3
+c        print *,
+c
+        alp = C+I2U*eye
         call invert (alp, ainv)
-        bet = I1U*C+I3U*I2
+        bet = I1U*C+I3U*eye
         call tc_2s2 (ainv,bet,U)
         call invert (U,UINV)
         call tc_2s2 (F,UINV,R)

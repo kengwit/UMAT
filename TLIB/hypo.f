@@ -38,3 +38,10 @@ c
 c
        end subroutine
 c
+       subroutine drate (D,W,B,O)
+c
+        double precision, intent (in) :: W(9),D(9),B(9)
+c
+        return
+c
+       end subroutine drate

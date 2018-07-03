@@ -4,10 +4,10 @@ c
 c
           double precision :: dgam, gam, gf, b
           double precision :: F0(9), F1(9) 
-          double precision :: F(9),dF(9),l(9),D(9),W(9)
-          double precision :: ep(9), deps(9), eW(9), We(9)
-          double precision :: sig (9), sigW(9), Wsig(9)
-		  double precision :: sigp(9), epp(9)
+          double precision :: F(9),dF(9),l(9),D(9),W(9),R(9),logc
+          double precision :: ep(9), deps(9), eR(9), Re(9)
+          double precision :: sig (9), sigR(9), Rsig(9)
+          double precision :: sigp(9), epp(9)
           double precision :: cm(2), hisv(1)
           integer i,inc
 c
@@ -41,16 +41,21 @@ c
 c
 c           Perform objective update on strain
 c
-            call tc_2s2 (ep,W,eW)
-            call tc_2s2 (W,ep,We)
-            deps = D - eW + We
+             logc = 0.25_8*dgam
+             logc = logc * ((4/(4+gam*gam))+(gam/SQRT(4+gam*gam)
+     &              *ASINH(gam/2)))
+             R = logc*(/ 0,1,0,-1,0,0,0,0,0 /) 
+c            R = W
+            call tc_2s2 (ep,R,eR)
+            call tc_2s2 (R,ep,Re)
+            deps = D - eR + Re
             ep = ep + deps
 c
 c           Perform objective update on stress (-sigW + Wsig, the objective update)
 c
-            call tc_2s2 (sig,W,sigW)
-            call tc_2s2 (W,sig,Wsig)
-            sig = sig - sigW + Wsig           
+            call tc_2s2 (sig,R,sigR)
+            call tc_2s2 (R,sig,Rsig)
+            sig = sig - sigR + Rsig           
 c
 c           Perform stress update on stress (sig dot hat, the stress update)
 c
@@ -70,8 +75,8 @@ c            print *,
 c            print *,"deps"
 c            call t2print (deps)
 c            print *,
-c            print *,"W"
-c            call t2print (W)
+c            print *,"R"
+c            call t2print (R)
 c            print *,
 c            print *,"D"
 c            call t2print (D)

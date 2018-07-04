@@ -43,10 +43,11 @@ c           Perform objective update on strain
 c
              if (i.ne.1) then
                 logc = dgam/(4.0_8+gam*gam)
-			    logc = logc + dgam*gam*0.25_8/(SQRT(4+gam*gam)*ASINH(gam/2))
+                logc = logc + dgam*gam*0.25_8/(SQRT(4+gam*gam)
+     &                        *ASINH(gam/2))
                 R = logc*(/ 0,1,0,-1,0,0,0,0,0 /)
              else
-			    R = 0.0_8
+	        R = 0.0_8
              end if			 
 c            R = W
             call tc_2s2 (ep,R,eR)

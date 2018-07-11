@@ -1,0 +1,5 @@
+#!/bin/bash
+#compile A3-ME 725
+clear
+gfortran -o A3 -std=legacy A3.f ../TLIB/tensor.f ../TLIB/thelper.f ../TLIB/fe.f ../TLIB/hypo.f ../TLIB/ttest.f ../TLIB/mat.f 2>error.log
+head error.log

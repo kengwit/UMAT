@@ -97,7 +97,7 @@ c
 c
 c           plastic loop time!
 c
-            do while (sflow.gt.tol.OR.cnt.lt.5)
+            do while (ABS(sflow).gt.tol.OR.cnt.lt.20)
 c
 c            +  use normal and elastic tensor to calculate
 c            +  plastic correction

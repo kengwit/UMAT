@@ -1,6 +1,11 @@
 #!/bin/bash
 #remove output files from running assignment executables
 clear
+git rm output.log
+git rm error.log
+git rm A3
+git rm SS
 rm output.log
 rm error.log
 rm A3
+rm SS

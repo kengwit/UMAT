@@ -52,10 +52,11 @@ c
          double precision, intent (inout) :: sig (9), hisv(11)
          double precision :: L4 (9,9), strial (9), dsig(9)
          double precision :: sbar, seq, h, sflow, N(9), ph (9,9)
-         double precision :: dlam, ddlam, dep,tol,sflow_t, pl_corr(9)
+         double precision :: dlam, ddlam, dep,tol,sbar_t, pl_corr(9)
          double precision :: LN(9), NLN
          integer :: cnt
          tol = cm(3)*1e-8_8
+c         print *,tol
 c
 c        cm(1) = E (Young's Modulus) {Pa}
 c        cm(2) = v (Poisson's ratio) {-}
@@ -97,7 +98,7 @@ c
 c
 c           plastic loop time!
 c
-            do while (ABS(sflow).gt.tol.OR.cnt.lt.20)
+            do while (DABS(sflow).gt.tol.AND.cnt.lt.5)
 c
 c            +  use normal and elastic tensor to calculate
 c            +  plastic correction
@@ -110,8 +111,8 @@ c            +  recalculate seq and sflow to determine whether
 c            +  material is still yielding
 c
                call VMS (sig,seq)
-               sflow_t = sflow + h*dep
-               sflow = seq - sflow_t
+               sbar_t = sbar + h*dep
+               sflow = seq - sbar_t
 c
 c            +  update plastic multiplier increment, plastic multiplier
 c            +  and plastic strain (the same in assoc. flow) to reflect
@@ -122,10 +123,12 @@ c
                dlam = dlam + ddlam
                dep = dlam
                cnt = cnt + 1
+c               print *,sflow
 c
             end do
             hisv(1) = hisv(1) + dep
             hisv(11) = seq
+c            print *,
          end if
          return
 c

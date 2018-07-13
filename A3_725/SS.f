@@ -11,7 +11,7 @@ c
           double precision :: cm(5), hisv(11)
           integer i,inc
 c
-          dgam = 0.001_8
+          dgam = 0.0005_8
           gam = 0.0_8
           gf = 3.0_8
           b = 0.5_8

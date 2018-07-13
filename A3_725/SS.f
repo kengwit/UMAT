@@ -8,7 +8,7 @@ c
           double precision :: ep(9), deps(9), eR(9), Re(9)
           double precision :: sig (9), sigR(9), Rsig(9)
           double precision :: sigp(9), epp(9)
-          double precision :: cm(5), hisv(1)
+          double precision :: cm(5), hisv(11)
           integer i,inc
 c
           dgam = 0.001_8
@@ -69,9 +69,10 @@ c
             call CH (ep, epp)
 	    call CH (sig, sigp)
 c            call umat_elastic (cm,deps,sig,hisv)
-            call umat_43 (cm,deps,sig,hisv,0.0_8,0.0_8)
-            print "(25e15.6)",gam,ep,sig,
-     &            epp(1),epp(5),epp(9),sigp(1),sigp(5),sigp(9)
+            call umat_43 (cm,sig,deps,hisv,0.0_8,0.0_8)
+            print "(27e15.6)",gam,ep,sig,
+     &            epp(1),epp(5),epp(9),sigp(1),sigp(5),sigp(9),
+     &            hisv(1),hisv(11)
 c
 c            print *,
 c            print *,"gamma:"

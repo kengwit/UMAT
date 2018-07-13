@@ -49,7 +49,7 @@ c
 c
          implicit none
          double precision, intent (in) :: cm(5), deps (9), tt, dt
-         double precision, intent (inout) :: sig (9), hisv(1)
+         double precision, intent (inout) :: sig (9), hisv(11)
          double precision :: L4 (9,9), strial (9), dsig(9)
          double precision :: sbar, seq, h, sflow, N(9), ph (9,9)
          double precision :: dlam, ddlam, dep,tol,sflow_t, pl_corr(9)
@@ -68,6 +68,8 @@ c           1. Calculate Trial Stress
 c ==========================================
          call L4_EL (cm(1), cm(2), L4)
          call tc_4d2 (L4,deps,dsig)
+c         print "(3e12.4)",dsig
+c         print *,
          strial = sig + dsig
 c ==========================================
 c           2. Find Eqv. and Yield Stress
@@ -123,6 +125,7 @@ c
 c
             end do
             hisv(1) = hisv(1) + dep
+            hisv(11) = seq
          end if
          return
 c

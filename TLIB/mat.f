@@ -32,7 +32,7 @@ c
 
          if (cflag.eq.2) then
             call A2S (A,S)
-            call t2print (S)
+c            call t2print (S)
             s1d = (1.5_8/seq)*S
          else if (cflag.eq.3) then
          else

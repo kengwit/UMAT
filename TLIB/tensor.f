@@ -206,7 +206,7 @@ c
        subroutine tc_2d2 (A,B,c)
 c
         implicit none
-        double precision, intent (in) :: A(9),B(9)
+        double precision, intent (inout) :: A(9),B(9)
         double precision, intent (out) :: c
 c
         c = A(1)*B(1)+A(2)*B(4)+A(3)*B(7)

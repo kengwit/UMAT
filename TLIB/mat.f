@@ -25,16 +25,15 @@ c
          integer, intent(in) :: cflag
 c
 c
-         seq = SQRT(A(1)*A(1)+A(5)*A(5)+A(9)*A(9)
-     &        -A(1)*A(5)-A(5)*A(9)-A(9)*A(1)
-     &        +3.0_8*A(6)*A(6)+3.0_8*A(7)*A(7)+3.0_8*A(2)*A(2))
+         call VMS (A,seq)
 c
          s1d = 0.0_8
          s2d = 0.0_8
 
          if (cflag.eq.2) then
             call A2S (A,S)
-            s1d = 1.5_8/seq*S
+            call t2print (S)
+            s1d = (1.5_8/seq)*S
          else if (cflag.eq.3) then
          else
          end if

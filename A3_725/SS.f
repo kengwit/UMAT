@@ -8,13 +8,18 @@ c
           double precision :: ep(9), deps(9), eR(9), Re(9)
           double precision :: sig (9), sigR(9), Rsig(9)
           double precision :: sigp(9), epp(9)
-          double precision :: cm(5), hisv(11)
+          double precision :: cm(5), hisv(11), gamout(6)
+          integer incout(6),place
           integer i,inc
 c
           dgam = 0.0005_8
           gam = 0.0_8
-          gf = 3.0_8
+          gf = 6.001_8
           b = 0.5_8
+          gamout = (/ 0.005_8,0.1_8,0.5_8,1.0_8,3.0_8,6.0_8 /)
+          incout = gamout / dgam
+          incout = incout + 1
+          place = 1
 c
           inc = gf/dgam
           cm(1) = 205000_8
@@ -70,9 +75,13 @@ c
 	    call CH (sig, sigp)
 c            call umat_elastic (cm,deps,sig,hisv)
             call umat_43 (cm,sig,deps,hisv,0.0_8,0.0_8)
-            print "(27e15.6)",gam,ep,sig,
-     &            epp(1),epp(5),epp(9),sigp(1),sigp(5),sigp(9),
-     &            hisv(1),hisv(11)
+            if (i.eq.incout(place)) then
+               print "(27e15.6)",gam,ep,sig,
+     &               epp(1),epp(5),epp(9),sigp(1),sigp(5),sigp(9),
+     &               hisv(1),hisv(11)
+               place = place + 1
+c
+            end if
 c
 c            print *,
 c            print *,"gamma:"

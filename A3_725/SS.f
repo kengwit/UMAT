@@ -60,13 +60,16 @@ c
 c            R = W
             call tc_2s2 (ep,R,eR)
             call tc_2s2 (R,ep,Re)
-            deps = D - eR + Re
-            ep = ep + deps
+c           +Objective Update of Strain HERE
+             deps = D
+c            deps = D - eR + Re
+            ep = ep + deps -eR + Re
 c
 c           Perform objective update on stress (-sigW + Wsig, the objective update)
 c
             call tc_2s2 (sig,R,sigR)
             call tc_2s2 (R,sig,Rsig)
+c           +Objective Update of Stress HERE
             sig = sig - sigR + Rsig           
 c
 c           Perform stress update on stress (sig dot hat, the stress update)

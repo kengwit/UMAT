@@ -171,7 +171,9 @@ c
               ep = ep + deps
 c
 c               print "(9e15.6)",ep
-              print "(20e15.6)",ep,sig,hisv(1),hisv(11)
+              if (MODULO(i,20).eq.0) then
+                  print "(20e15.6)",ep,sig,hisv(1),hisv(11)
+              end if
 c
          end do
 c

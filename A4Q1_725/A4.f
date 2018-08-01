@@ -118,7 +118,9 @@ c  Regardless, I do not have F so I can't find W
 c
               ep = ep + deps
 c
-              print "(20e15.6)",ep,sig,hisv(1),hisv(11)
+              if (MODULO(i,20).eq.0) then
+             	 print "(20e15.6)",ep,sig,hisv(1),hisv(11)
+              end if
 c
          end do
 c

@@ -14,6 +14,7 @@ c
          double precision :: x2nm1, x2nm2, f2nm1, deltas33
          double precision :: f1x1m2, f1x2m2, f2x1m2, f2x2m2
          double precision :: df1dx1, df1dx2, df2dx1, df2dx2
+         double precision :: a,b,c,d,ai,bi,ci,di,admbc
          double precision :: tol
          integer :: i,final,cnt
 c
@@ -43,7 +44,7 @@ c
          d33trial = 0.0_8
          s33trial = 0.0_8
          cnt = 1
-         final = 2
+         final = 1000
 c
          do i = 1,final 
 c
@@ -77,8 +78,8 @@ c
               call umat_43(cm,strial,dtrial,hisv,0.0_8,0.0_8)
               s22trial(2) = strial(5)
               s33trial(2) = strial(9)
-              deltas22 = 100
-              deltas33 = 100
+              deltas22 = cm(3)
+              deltas33 = cm(3)
               cnt = 3             
 c             
               do while (    (DABS(deltas22).GT.tol*100)
@@ -95,7 +96,10 @@ c
                   x2nm2 = d33trial(cnt-2)
 c
                   f1nm1 = s22trial(cnt-1)
+
                   f2nm1 = s33trial(cnt-1)
+c
+c Find first derivatives wrt x1
 c
                   dtrial = deps
                   strial = sig
@@ -105,6 +109,8 @@ c
                   call umat_43(cm,strial,dtrial,hisv,0.0_8,0.0_8)
                   f1x1m2 = strial(5)
                   f2x1m2 = strial(9)             
+c
+c Find first derivatives wrt x2
 c
                   dtrial = deps
                   strial = sig
@@ -120,11 +126,21 @@ c
                   df2dx1 = (f2nm1-f2x1m2)/(x1nm1-x1nm2)
                   df2dx2 = (f2nm1-f2x2m2)/(x2nm1-x2nm2)
 c
+                  a = df1dx1
+                  b = df2dx1
+                  c = df1dx2
+                  d = df2dx2
+                  admbc = 1.0_8/(a*d - b*c)
+                  ai = d * admbc
+                  bi = -b * admbc
+                  ci = -c * admbc
+                  di = a * admbc
+c
                   d22trial(cnt) = x1nm1
-     &                          - f1nm1 / df1dx1 - f2nm1 / df2dx1
+     &                          - f1nm1 * ai - f2nm1 * bi
 c
                   d33trial(cnt) = x2nm1 
-     &                          - f1nm1 / df1dx2 - f2nm1 / df2dx2
+     &                          - f1nm1 * ci - f2nm1 * di
 
 c
                   hisv(1) = eps
@@ -137,8 +153,8 @@ c
                   s33trial(cnt) = strial(9)
                   deltas22 = s22trial(cnt) - s22trial(cnt-1)
                   deltas33 = s33trial(cnt) - s33trial(cnt-1)
-                  print "(2e15.6)",d22trial(cnt-1),d22trial(cnt)
-c                  print "(4e15.6)",f1nm1,df1dx2,f2nm1,df2dx2
+c                  print "(2e15.6)",d33trial(cnt),d22trial(cnt)
+c                  print "(4e15.6)",ai,bi,ci,di
                   cnt = cnt + 1                 
 c
               end do
@@ -154,8 +170,8 @@ c  Regardless, I do not have F so I can't find W
 c
               ep = ep + deps
 c
-               print "(9e15.6)",sig
-c              print "(20e15.6)",ep,sig,hisv(1),hisv(11)
+c               print "(9e15.6)",ep
+              print "(20e15.6)",ep,sig,hisv(1),hisv(11)
 c
          end do
 c

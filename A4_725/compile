@@ -1,5 +1,0 @@
-#!/bin/bash
-#compile A4-ME 725
-clear
-gfortran -o A4 -std=legacy A4.f ../TLIB/tensor.f ../TLIB/thelper.f ../TLIB/fe.f ../TLIB/hypo.f ../TLIB/ttest.f ../TLIB/mat.f 2>error.log
-head error.log

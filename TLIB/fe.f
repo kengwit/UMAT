@@ -296,6 +296,9 @@ c
 c
        end subroutine DEV4
 c
+c      THIS IS A REALLY SLOW WAY OF FINDING VON MISES
+c      DO NOT USE UNLESS ABSOLUTELY NECESSESARY. USE VMS
+c
        subroutine SEQ (A,vm)
 c
         implicit none
@@ -514,4 +517,24 @@ c
         return
 c
        end subroutine PD         
+c
+       subroutine kindef (F0, F1, b, dF, Fb, lb, Db, Wb)
+c
+         double precision, intent(in) :: F0(9), F1(9)
+         double precision, intent(in) :: b
+         double precision, intent(out) :: dF(9), Fb(9),lb(9),Db(9),Wb(9)
+         double precision :: Finv(9)
+c
+         dF = F1-F0
+c
+c        Fb (b=0,0.5,1 for backward, midpoint, and forward)
+c
+         Fb = F0-b*F0+b*F1
+         call invert (Fb,Finv)
+         call tc_2s2 (dF,Finv,lb)
+         call SYM2 (lb,Db)
+         call SKEW2 (lb,Wb)
+         return
+c
+       end subroutine kindef
 c

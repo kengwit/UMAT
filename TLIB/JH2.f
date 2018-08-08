@@ -26,11 +26,11 @@ c   sflow = flow stress
 c
 c
         subroutine JH2_flow (
-    &              epd,P,D,A,B,c,n,m,EPSI,T,SFmax,PHEL,SHEL,sflow)
+     &             epd,P,D,A,B,c,n,m,EPSI,T,SFmax,PHEL,SHEL,sflow)
 c
          implicit none
          double precision, intent (in) :: epd,P,D,A,B,c,n,m,T,
-    &                                     SFmax,HEL,PHEL,SHEL
+     &                                    SFmax,PHEL,SHEL,EPSI
          double precision, intent (inout) :: sflow
          double precision :: si, sf, Ps, Ts, es
 c
@@ -41,7 +41,7 @@ c
          sf = B * Ps ** m * es
          if (sf.GT.SFmax) then
             sf = SFmax
-         end
+         end if
          sflow = SHEL * (si - D*si + D*sf)
 c
          return

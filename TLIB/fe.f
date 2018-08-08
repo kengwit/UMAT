@@ -538,3 +538,28 @@ c
 c
        end subroutine kindef
 c
+c
+c     
+       subroutine kindefgen (F,alp,flag)
+c
+        implicit none 
+        double precision, intent (inout) :: F(9)
+        double precision, intent (in) :: alp
+        integer, intent (in) :: flag
+c
+        F = 0.0_8
+c
+        if (flag.eq.1) then
+c
+c          Simple shear deformation gradient
+c
+           F = (/ 1.0_8,   alp,  0.0_8,
+     &            0.0_8, 1.0_8,  0.0_8,
+     &            0.0_8, 0.0_8,  1.0_8 /)
+c
+        else if (flag.eq.2) then
+        else
+        end if
+c
+c
+       end subroutine kindefgen

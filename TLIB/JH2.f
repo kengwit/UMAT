@@ -80,3 +80,39 @@ c
 c
         end subroutine JH2_damage
 c
+c
+c
+c      
+        subroutine umat_JH2 (cm, sig, deps, hisv, tt, dt)
+c
+          implicit none
+          double precision, intnet (in) :: cm (20), deps (9), tt, dt
+          double precision, intent (inout) :: sig (9), hisv (12)
+          double precision :: L4 (9,9), strial (9), dsig(9)
+c
+c         cm(1) = MID   , material id          
+c         cm(2) = RO    , density
+c         cm(3) = G     , shear modulus
+c         cm(4) = A     , intact material strength coefficient
+c         cm(5) = B     , fractured material strength exponent
+c         cm(6) = C     , strain rate coefficent
+c         cm(7) = M     , fractured material strength exponent
+c         cm(8) = N     , intact material strength coefficient
+c         cm(9) = EPSI  , quasi-static strain rate threshold
+c         cm(10) = T    , hydrostatic tensile strength
+c         cm(11) = SFmax, maximum normalized fractured strength
+c         cm(12) = HEL  , hugoniot elastic limit 
+c         cm(13) = PHEL , pressure component of HEL
+c         cm(14) = BETA , fraction of elastic energy converted to pressure 
+c         cm(15) = D1   , damage accumulation coefficient
+c         cm(16) = D2   , damage accumulation exponent
+c         cm(17) = K1   , EOS term 1 (if K2,K3=0, K1 is the bulk mod.)
+c         cm(18) = K2   , EOS term 2
+c         cm(19) = K3   , EOS term 3
+c         cm(20) = FS   , failure criteria
+                    
+c
+          return
+c
+        end subroutine umat_JH2 ()
+c

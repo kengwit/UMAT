@@ -1,5 +1,0 @@
-#!/bin/bash
-#compile Single Element Test-bed
-clear
-gfortran -o SET -std=legacy SET.f ../TLIB/tensor.f ../TLIB/thelper.f ../TLIB/fe.f ../TLIB/ttest.f ../TLIB/JH2.f 2>error.log
-head error.log

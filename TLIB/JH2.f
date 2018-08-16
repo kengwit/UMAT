@@ -1,5 +1,5 @@
 c
-c   Subroutine to find the JH2-flow stress, which is dependent on 
+c   Subroutine to find the JH2 yield stress, which is dependent on 
 c   pressure, strain rate and damage accumulated. All values are
 c   normalized with respect to the HEL (stress wrt SHEL, pressure
 c   wrt PHEL). 
@@ -22,28 +22,22 @@ c   SHEL = Deviatoric comp. of HEL       (JH2 param.)
 c
 c   outputs
 c   =======
-c   sflow = flow stress
-c   REMOVED -> h = hardening rate (found numerically)
+c   syield = yield stress
 c
-c   I can't find h inside the flow rule function since I
-c   need access to the previous and current flow stresses
-c   It would much easier keep the old flow stress in a 
-c   variable and calculate hardening rate based on that...
-c 
-c
-        subroutine JH2_flow (
-     &             epd,P,D,A,B,c,n,m,EPSI,T,SFmax,PHEL,SHEL,sflow,h)
+        subroutine JH2_yield (
+     &             epd,P,D,A,B,c,n,m,EPSI,T,SFmax,HEL,PHEL,syield)
 c
          implicit none
          double precision, intent (in) :: epd,P,D,A,B,c,n,m,T,
-     &                                    SFmax,PHEL,SHEL,EPSI
-         double precision, intent (inout) :: sflow, h
-         double precision :: si, sf, Ps, Ts, es
+     &                                    SFmax,HEL,PHEL,EPSI
+         double precision, intent (inout) :: syield
+         double precision :: si, sf, Ps, Ts, es, SHEL
 c
 c        Find normalized pressure and tensile strength constant (wrt PHEL)
 c        =================================================================
          Ps = P / PHEL
          Ts = T / PHEL
+         SHEL = 1.5_8 * (HEL - PHEL)
 c
 c        Find normalized strain rate (wrt EPSI) and find strain rate term
 c        ================================================================
@@ -62,11 +56,11 @@ c        ====================================================================
 c
 c        Calculate flow stress based on si, sf and damage
 c        ================================================
-         sflow = SHEL * (si - D*si + D*sf)
+         syield = SHEL * (si - D*si + D*sf)
 c 
          return
 c
-        end subroutine JH2_flow
+        end subroutine JH2_yield
 c
 c  Subroutine to update damage in the JH2 model 
 c
@@ -143,13 +137,95 @@ c
 c
 c
 c      
+c  inputs
+c  ======
+c  P = hydrostatic pressure
+c  D = damage
+c  A = intact strength coefficent 
+c  B = damaged strength coefficient
+c  M = damaged strength exponent
+c  N = intact strength exponent
+c  HEL = hugoniot elastic limit
+c  PHEL = hydrostatic pressure at HEL
+c  Lel = elastic tensor
+c  N = normal vector (from vm_box)
+c  D1 = damage accumulation coefficient
+c  D2 = damage accumulation exponent
+c
+c  outputs
+c  =======
+c  h = hardening rate (ds_bar/dep)
+c
+        subroutine JH2_hardening 
+     &  (epd,P,D,A,B,c,M,N,T,HEL,PHEL,SFmax,EPSI,Lel,NOR,D1,D2,h)
+
+c
+          implicit none
+          double precision, intent (in) :: epd,P,D,A,B,c,M,N,T
+          double precision, intent (in) :: HEL,PHEL,SFmax,EPSI
+          double precision, intent (in) :: Lel(9,9), NOR(9), D1, D2
+          double precision, intent (inout) :: h
+          double precision :: es, si, sf, ef, Ps, Ts, SHEL
+          double precision :: alp, bet, kap, KIJ(9), LN(9), KLN
+c
+c
+c        Find normalized pressure and tensile strength constant (wrt PHEL)
+c        =================================================================
+         Ps = P / PHEL
+         Ts = T / PHEL
+         SHEL = 1.5 * (HEL - PHEL)
+c
+c        Find normalized strain rate (wrt EPSI) and find strain rate term
+c        ================================================================
+         es = 1.0_8+c*log(epd/EPSI)
+c
+c        Find normalized strength at D=0 (si) , D=1 (sf)
+c        ===============================================
+         si = A * (Ps+Ts) ** n * es
+         sf = B * Ps ** m * es
+c
+c        Check if normalized fractured strength exceeds SFmax, if so sf=SFmax
+c        ====================================================================
+         if (sf.GT.SFmax) then
+            sf = SFmax
+         end if
+c
+c        Find failure strain at given pressure
+c        =====================================
+         ef = D1 ** (Ps+Ts) ** D2
+         if (ef.lt.1e-20) then
+            ef = 1e-20
+         end if
+c
+c        Find intermediates to find total derivative
+c        ===========================================
+         call KD (KIJ)
+         call tc_4d2 (Lel,NOR,LN)
+         call tc_2d2 (KIJ,LN,KLN)
+         kap = Ps * KLN / PHEL / 3.0_8
+         alp = A * N * (Ps-Ts)**(n-1.0_8)
+         bet = B * m * (Ps)**(m-1.0_8)
+c
+         h = SHEL * ((1.0_8-D)*alp*kap+D*bet*kap+(sf-si)/ef) 
+c
+         return
+c
+        end subroutine JH2_hardening
+c
+c      
         subroutine umat_JH2 (cm, sig, deps, hisv, tt, dt)
 c
           implicit none
-          double precision, intnet (in) :: cm (20), deps (9), tt, dt
+          double precision, intent (in) :: cm (20), deps (9), tt, dt
           double precision, intent (inout) :: sig (9), hisv (12)
           double precision :: L4 (9,9), strial (9), dsig(9), E, v
-          double precision :: seq, sbar, h, sflow, N(9), ph (9,9)
+          double precision :: seq, sbar, h, sflow, NOR(9), ph (9,9)
+          double precision :: LN (9), NLN, pl_corr(9), SHEL, syield
+          double precision :: MID,RO,G,A,B,C,M,N,EPSI,T,SFmax,HEL,PHEL
+          double precision :: BETA, D1, D2, K1, K2, K3, FS
+          double precision :: P,D, dlam, ddlam, dep, ef, Ps, Ts, sbar_t  
+          double precision :: tol
+          integer cnt
 c
 c         cm(1) = MID   , material id          
 c         cm(2) = RO    , density
@@ -172,14 +248,40 @@ c         cm(18) = K2   , EOS term 2
 c         cm(19) = K3   , EOS term 3
 c         cm(20) = FS   , failure criteria
 c
+         MID = cm(1)
+         RO = cm(2)
+         G = cm(3)
+         A = cm(4)
+         B = cm(5)
+         C = cm(6)
+         M = cm(7)
+         N = cm(8)
+         EPSI = cm(9)
+         T = cm(10)
+         SFmax = cm(11)
+         HEL = cm(12) 
+         PHEL = cm(13)
+         BETA = cm(14)
+         D1 = cm(15)
+         D2 = cm(16)
+         K1 = cm(17)
+         K2 = cm(18)
+         K3 = cm(19)
+         FS = cm(20)
+         D = hisv(12)
+         call I1 (sig, P)
+         P = P / 3.0_8
+         syield = 0.0_8
+c
 c ================================
 c    1. Calculate Trial Stress
 c ================================                   
 c
 c         Get elastic constants from G,K
 c         ==============================
-          E = 9.0_8*cm(3)*cm(17)/(3.0_8*cm(17)+cm(3))
-          v = (3.0_8*cm(3)-2.0_8*cm(17))/(2.0_8*(3.0_8*cm(17)+cm(3)))
+          E = 9.0_8*G*K1/(3.0_8*K1+G)
+          v = (3.0_8*G-2.0_8*K1)/(2.0_8*(3.0_8*K1+G))
+          SHEL = 1.5_8*(HEL-PHEL)
 c
 c         Get elastic fourth order tensor L4
 c         ==================================
@@ -199,9 +301,75 @@ c ================================
 c
 c         Find equivalent stress and normal using vm_box
 c         ==============================================
-          call vm_box (sig,2,seq,N,ph)           
-          
-c          return
+          call vm_box (sig,2,seq,NOR,ph)
 c
-        end subroutine umat_JH2 ()
+c         Find yield stress using JH2_yield
+c         =================================
+          call JH2_yield 
+     &    (0.0_8,P,D,A,B,c,M,N,EPSI,T,SFmax,HEL,PHEL,syield)
+c
+c         Check for yielding
+c         ==================
+          sflow = seq - syield
+c
+          if (sflow.lt.0.0_8) then
+             sig = strial
+          else
+c         =====================
+c         Initiate PLASTIC LOOP
+c         =====================
+          call JH2_hardening 
+     &    (0.0_8,P,D,A,B,c,M,N,T,HEL,PHEL,SFmax,EPSI,L4,NOR,D1,D2,h)
+c           
+c  prime the loop, set all counters to 0
+c  set sflow = 100 to ensure this runs once
+c
+            dlam = 0.0_8
+            dep = 0.0_8
+            cnt = 1
+            sflow = 100.0_8
+c
+c           plastic loop time!
+c
+            do while (DABS(sflow).gt.tol.AND.cnt.lt.5)
+c
+c            +  use normal and elastic tensor to calculate
+c            +  plastic correction
+c
+               call tc_4d2(L4,NOR,LN)
+               pl_corr = dlam * LN
+               sig = strial - pl_corr
+c
+c            +  recalculate seq and sflow to determine whether
+c            +  material is still yielding
+c
+               call VMS (sig,seq)
+               sbar_t = sbar + h*dep
+               sflow = seq - sbar_t
+c
+c            +  update plastic multiplier increment, plastic multiplier
+c            +  and plastic strain (the same in assoc. flow) to reflect
+c            +  plastic correction
+c               
+               call tc_2d2 (NOR,LN,NLN)
+               ddlam = sflow / (NLN+h)
+               dlam = dlam + ddlam
+               dep = dlam
+               cnt = cnt + 1
+c
+            end do
+            hisv(1) = hisv(1) + dep
+            hisv(11) = seq
+c
+c           +  update damage variable based on plastic strain increment
+c
+            Ps = P / PHEL
+            Ts = T / PHEL
+            ef = D1 ** (Ps+Ts) ** D2
+            D = D + dep / ef
+            hisv(12) = D
+          end if
+c         return
+c
+        end subroutine umat_JH2
 c

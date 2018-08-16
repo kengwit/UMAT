@@ -1,0 +1,5 @@
+#!/bin/bash
+#compile SS ME725
+clear
+gfortran -o SS -std=legacy SS.f ../TLIB/tensor.f ../TLIB/thelper.f ../TLIB/fe.f ../TLIB/JH2.f 2>error.log
+head error.log

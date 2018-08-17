@@ -47,6 +47,8 @@ c        Find normalized strength at D=0 (si) , D=1 (sf)
 c        ===============================================
          si = A * (Ps+Ts) ** n * es
          sf = B * Ps ** m * es
+         print *,"strain scale"
+         print "(2e12.4)",es
 c
 c        Check if normalized fractured strength exceeds SFmax, if so sf=SFmax
 c        ====================================================================
@@ -224,7 +226,7 @@ c
           double precision :: MID,RO,G,A,B,C,M,N,EPSI,T,SFmax,HEL,PHEL
           double precision :: BETA, D1, D2, K1, K2, K3, FS
           double precision :: P,D, dlam, ddlam, dep, ef, Ps, Ts, sbar_t  
-          double precision :: tol
+          double precision :: tol, epd
           integer cnt
 c
 c         cm(1) = MID   , material id          
@@ -272,6 +274,12 @@ c
          call I1 (sig, P)
          P = P / 3.0_8
          syield = 0.0_8
+         tol = G * 1.0e-6_8
+         epd = 0.0_8
+c
+         if (ABS(epd).lt.1e-20) then
+            epd = 1e-20
+         end if
 c
 c ================================
 c    1. Calculate Trial Stress
@@ -280,16 +288,23 @@ c
 c         Get elastic constants from G,K
 c         ==============================
           E = 9.0_8*G*K1/(3.0_8*K1+G)
-          v = (3.0_8*G-2.0_8*K1)/(2.0_8*(3.0_8*K1+G))
+          v = (3.0_8*K1-2.0_8*G)/(2.0_8*(3.0_8*K1+G))
+c          print "(2e12.4)",E,v
           SHEL = 1.5_8*(HEL-PHEL)
 c
 c         Get elastic fourth order tensor L4
 c         ==================================
           call L4_EL (E,v,L4)
+c          print *,
+c          call t4print (L4)
+c          print *,
 c
 c         Calculate stress increment (dsig = L:D)
 c         =======================================
           call tc_4d2 (L4,deps,dsig)
+c          print *,
+c          call t2print (dsig)
+c          print *,
 c
 c         Update strial with dsig (sn+1,trial = sn + dsig)
 c         ================================================
@@ -306,7 +321,10 @@ c
 c         Find yield stress using JH2_yield
 c         =================================
           call JH2_yield 
-     &    (0.0_8,P,D,A,B,c,M,N,EPSI,T,SFmax,HEL,PHEL,syield)
+     &    (epd,P,D,A,B,c,M,N,EPSI,T,SFmax,HEL,PHEL,syield)
+          print *,"Yield Strength"
+          print "(1e12.4)", syield
+          print *,
 c
 c         Check for yielding
 c         ==================
@@ -319,7 +337,7 @@ c         =====================
 c         Initiate PLASTIC LOOP
 c         =====================
           call JH2_hardening 
-     &    (0.0_8,P,D,A,B,c,M,N,T,HEL,PHEL,SFmax,EPSI,L4,NOR,D1,D2,h)
+     &    (epd,P,D,A,B,c,M,N,T,HEL,PHEL,SFmax,EPSI,L4,NOR,D1,D2,h)
 c           
 c  prime the loop, set all counters to 0
 c  set sflow = 100 to ensure this runs once
